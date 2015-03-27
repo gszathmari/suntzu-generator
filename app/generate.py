@@ -41,6 +41,13 @@ def run(environ, start_response):
       ('Content-type','application/json'),
       ('Content-Length', str(len(data)))
     ]
+  elif requestPath == '/healthcheck':
+    data = 'OK\n'.encode('utf-8')
+    status = '200 OK'
+    response_headers = [
+      ('Content-type','text/plain'),
+      ('Content-Length', str(len(data)))
+    ]
   else:
     data = 'Not found'.encode('utf-8')
     status = '404 Not Found'
