@@ -10,7 +10,7 @@ def getQuote(corpus=None):
     quoteGenerator = corpus
   else:
     quoteGenerator = markovgen.Markov()
-    lines          = [line.strip() for line in open('../data/artofwar.txt')]
+    lines          = [line.strip() for line in open('data/artofwar.txt')]
     [quoteGenerator.feed(line) for line in lines]
 
   # Generate quote
