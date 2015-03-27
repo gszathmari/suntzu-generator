@@ -3,6 +3,7 @@
 import markovgen
 import time
 import json
+import os
 
 def getQuote(corpus=None):
   # Recursion goodness
@@ -10,7 +11,8 @@ def getQuote(corpus=None):
     quoteGenerator = corpus
   else:
     quoteGenerator = markovgen.Markov()
-    lines          = [line.strip() for line in open('data/artofwar.txt')]
+    path, file     = os.path.split(os.path.abspath(__file__))
+    lines          = [line.strip() for line in open(path + '/data/artofwar.txt')]
     [quoteGenerator.feed(line) for line in lines]
 
   # Generate quote
@@ -46,6 +48,5 @@ def run(environ, start_response):
       ('Content-type','text/plain'),
       ('Content-Length', 0)
     ]
-
   start_response(status, response_headers)
   return iter([data])
