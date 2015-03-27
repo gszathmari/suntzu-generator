@@ -55,5 +55,7 @@ def run(environ, start_response):
       ('Content-type','text/plain'),
       ('Content-Length', 0)
     ]
+
+  response_headers.append(('Access-Control-Allow-Origin','*'))
   start_response(status, response_headers)
   return iter([data])
