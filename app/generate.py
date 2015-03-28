@@ -5,7 +5,7 @@ import time
 import json
 import os
 
-def getQuote(corpus=None):
+def getQuote(quoteLength, corpus=None):
   # Recursion goodness
   if corpus:
     quoteGenerator = corpus
@@ -16,46 +16,48 @@ def getQuote(corpus=None):
     [quoteGenerator.feed(line) for line in lines]
 
   # Generate quote
-  quote	= quoteGenerator.generate_markov_text(max_size=128, seed=None, backward=False).capitalize()
+  quote	= quoteGenerator.generate_markov_text(max_size=quoteLength, seed=None, backward=False).capitalize()
 
   # If quote is too short, roll again
-  if len(quote) > 128 or len(quote) < 50:
-    return getQuote(quoteGenerator)
+  if len(quote) > quoteLength or len(quote) < 50:
+    return getQuote(quoteLength, quoteGenerator)
   else:
     return str(quote)
 
 # Generate JSON output
-def generateResponse():
-  response = {'quote': getQuote(),
+def generateResponse(quoteLength=250):
+  response = {'quote': getQuote(quoteLength),
               'timestamp': int(time.time())}
   return json.dumps(response)
 
 # Simple HTTP server
 def run(environ, start_response):
   requestPath = str(environ['PATH_INFO'])
+  status      = '200 OK'
 
   if requestPath == '/v1/getquote': 
     data = generateResponse().encode('utf-8')
-    status = '200 OK'
     response_headers = [
       ('Content-type','application/json'),
-      ('Content-Length', str(len(data)))
+    ]
+  elif requestPath == '/v1/gettweet': 
+    data = generateResponse(140).encode('utf-8')
+    response_headers = [
+      ('Content-type','application/json'),
     ]
   elif requestPath == '/healthcheck':
     data = 'OK\n'.encode('utf-8')
-    status = '200 OK'
     response_headers = [
       ('Content-type','text/plain'),
-      ('Content-Length', str(len(data)))
     ]
   else:
     data = 'Not found'.encode('utf-8')
     status = '404 Not Found'
     response_headers = [
       ('Content-type','text/plain'),
-      ('Content-Length', 0)
     ]
 
+  response_headers.append(('Content-Length', str(len(data))))
   response_headers.append(('Access-Control-Allow-Origin','*'))
   start_response(status, response_headers)
   return iter([data])
