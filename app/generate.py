@@ -4,6 +4,7 @@ import markovgen
 import time
 import json
 import os
+import re
 
 def getQuote(quoteLength, corpus=None):
   # Recursion goodness
@@ -16,13 +17,17 @@ def getQuote(quoteLength, corpus=None):
     [quoteGenerator.feed(line) for line in lines]
 
   # Generate quote
-  quote	= quoteGenerator.generate_markov_text(max_size=quoteLength, seed=None, backward=False).capitalize()
+  quote	= quoteGenerator.generate_markov_text(max_size=quoteLength, seed=None, backward=False)
 
   # If quote is too short, roll again
   if len(quote) > quoteLength or len(quote) < 50:
     return getQuote(quoteLength, quoteGenerator)
   else:
-    return str(quote)
+    return capitalizeQuote(str(quote))
+
+def capitalizeQuote(quote):
+  rtn = re.split('([.!?] *)', quote)
+  return ''.join([each.capitalize() for each in rtn])
 
 # Generate JSON output
 def generateResponse(quoteLength=250):
